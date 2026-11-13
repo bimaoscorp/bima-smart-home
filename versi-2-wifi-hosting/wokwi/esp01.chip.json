@@ -1,0 +1,6 @@
+{
+  "name": "ESP-01",
+  "author": "BIMA Smart Home",
+  "pins": ["RX", "TX", "GND", "VCC", "", "", "", ""],
+  "controls": []
+}

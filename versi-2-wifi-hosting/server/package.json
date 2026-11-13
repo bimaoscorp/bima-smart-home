@@ -1,0 +1,13 @@
+{
+  "name": "bima-smarthome-server",
+  "version": "2.0.0",
+  "description": "Server BIMA Smart Home versi 2 (Arduino Uno + ESP-01 lewat internet)",
+  "type": "module",
+  "main": "server-bima.mjs",
+  "scripts": {
+    "start": "node server-bima.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

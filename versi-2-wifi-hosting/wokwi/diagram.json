@@ -1,0 +1,441 @@
+{
+  "version": 1,
+  "author": "BIMA Smart Home",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "wokwi-breadboard-half",
+      "id": "bb1",
+      "top": 0,
+      "left": 0,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-arduino-uno",
+      "id": "uno",
+      "top": 270,
+      "left": 0,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led3",
+      "top": 28.2,
+      "left": 29.8,
+      "attrs": {
+        "color": "yellow"
+      }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r3",
+      "top": 113.4,
+      "left": 25.45,
+      "rotate": 90,
+      "attrs": {
+        "value": "220"
+      }
+    },
+    {
+      "type": "wokwi-text",
+      "id": "tled3",
+      "top": -48,
+      "left": 28.8,
+      "attrs": {
+        "text": "Lampu\nteras"
+      }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led2",
+      "top": 28.2,
+      "left": 97,
+      "attrs": {
+        "color": "yellow"
+      }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r2",
+      "top": 113.4,
+      "left": 92.65,
+      "rotate": 90,
+      "attrs": {
+        "value": "220"
+      }
+    },
+    {
+      "type": "wokwi-text",
+      "id": "tled2",
+      "top": -48,
+      "left": 96,
+      "attrs": {
+        "text": "Lampu\nkamar"
+      }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led1",
+      "top": 28.2,
+      "left": 164.2,
+      "attrs": {
+        "color": "yellow"
+      }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r1",
+      "top": 113.4,
+      "left": 159.85,
+      "rotate": 90,
+      "attrs": {
+        "value": "220"
+      }
+    },
+    {
+      "type": "wokwi-text",
+      "id": "tled1",
+      "top": -48,
+      "left": 163.2,
+      "attrs": {
+        "text": "Lampu\nruang tamu"
+      }
+    },
+    {
+      "type": "wokwi-dht22",
+      "id": "dht",
+      "top": 3.3,
+      "left": 212.6,
+      "attrs": {
+        "temperature": "28.5",
+        "humidity": "75"
+      }
+    },
+    {
+      "type": "wokwi-text",
+      "id": "tdht",
+      "top": -92,
+      "left": 196,
+      "attrs": {
+        "text": "Sensor suhu\n& kelembapan"
+      }
+    },
+    {
+      "type": "board-ssd1306",
+      "id": "oled",
+      "top": 330,
+      "left": 300,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-text",
+      "id": "toled",
+      "top": 422,
+      "left": 296,
+      "attrs": {
+        "text": "OLED 0,96\" (I2C)"
+      }
+    },
+    {
+      "type": "chip-esp01",
+      "id": "esp",
+      "top": 410,
+      "left": 470,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-text",
+      "id": "tesp",
+      "top": 462,
+      "left": 464,
+      "attrs": {
+        "text": "Modul WiFi ESP-01\n(adaptor 5V)"
+      }
+    }
+  ],
+  "connections": [
+    [
+      "led3:A",
+      "bb1:4t.c",
+      "",
+      []
+    ],
+    [
+      "led3:C",
+      "bb1:3t.c",
+      "",
+      []
+    ],
+    [
+      "r3:1",
+      "bb1:4t.e",
+      "",
+      []
+    ],
+    [
+      "r3:2",
+      "bb1:4b.i",
+      "",
+      []
+    ],
+    [
+      "bb1:3t.e",
+      "bb1:bn.2",
+      "black",
+      [
+        "v106.9"
+      ]
+    ],
+    [
+      "uno:6",
+      "bb1:4b.j",
+      "green",
+      [
+        "v-40",
+        "h-143.7",
+        "v-82.4"
+      ]
+    ],
+    [
+      "led2:A",
+      "bb1:11t.c",
+      "",
+      []
+    ],
+    [
+      "led2:C",
+      "bb1:10t.c",
+      "",
+      []
+    ],
+    [
+      "r2:1",
+      "bb1:11t.e",
+      "",
+      []
+    ],
+    [
+      "r2:2",
+      "bb1:11b.i",
+      "",
+      []
+    ],
+    [
+      "bb1:10t.e",
+      "bb1:bn.8",
+      "black",
+      [
+        "v106.9"
+      ]
+    ],
+    [
+      "uno:5",
+      "bb1:11b.j",
+      "green",
+      [
+        "v-52",
+        "h-86",
+        "v-70.4"
+      ]
+    ],
+    [
+      "led1:A",
+      "bb1:18t.c",
+      "",
+      []
+    ],
+    [
+      "led1:C",
+      "bb1:17t.c",
+      "",
+      []
+    ],
+    [
+      "r1:1",
+      "bb1:18t.e",
+      "",
+      []
+    ],
+    [
+      "r1:2",
+      "bb1:18b.i",
+      "",
+      []
+    ],
+    [
+      "bb1:17t.e",
+      "bb1:bn.14",
+      "black",
+      [
+        "v106.9"
+      ]
+    ],
+    [
+      "uno:4",
+      "bb1:18b.j",
+      "green",
+      [
+        "v-64",
+        "h-28.3",
+        "v-58.4"
+      ]
+    ],
+    [
+      "dht:VCC",
+      "bb1:22b.f",
+      "",
+      []
+    ],
+    [
+      "dht:SDA",
+      "bb1:23b.f",
+      "",
+      []
+    ],
+    [
+      "dht:NC",
+      "bb1:24b.f",
+      "",
+      []
+    ],
+    [
+      "dht:GND",
+      "bb1:25b.f",
+      "",
+      []
+    ],
+    [
+      "bb1:22b.j",
+      "bb1:bp.18",
+      "red",
+      [
+        "v29.7"
+      ]
+    ],
+    [
+      "bb1:25b.j",
+      "bb1:bn.21",
+      "black",
+      [
+        "v39.7"
+      ]
+    ],
+    [
+      "uno:2",
+      "bb1:23b.j",
+      "blue",
+      [
+        "v-122.4"
+      ]
+    ],
+    [
+      "uno:GND.1",
+      "bb1:bn.1",
+      "black",
+      [
+        "v-14",
+        "h-125.5",
+        "v-68.7",
+        "h44"
+      ]
+    ],
+    [
+      "uno:5V",
+      "bb1:bp.1",
+      "red",
+      [
+        "v20",
+        "h-185",
+        "v-295.2",
+        "h59"
+      ]
+    ],
+    [
+      "oled:GND",
+      "bb1:bn.25",
+      "black",
+      [
+        "v-140.16",
+        "h-35.37"
+      ]
+    ],
+    [
+      "oled:VCC",
+      "bb1:bp.25",
+      "red",
+      [
+        "v-150.16",
+        "h-44.82"
+      ]
+    ],
+    [
+      "oled:SDA",
+      "uno:A4",
+      "violet",
+      [
+        "v-8",
+        "h61.1",
+        "v163.04",
+        "h-182",
+        "v-30"
+      ]
+    ],
+    [
+      "oled:SCL",
+      "uno:A5",
+      "orange",
+      [
+        "v-16",
+        "h80.93",
+        "v185.04",
+        "h-182.5",
+        "v-44"
+      ]
+    ],
+    [
+      "uno:A1",
+      "esp:RX",
+      "gold",
+      [
+        "v53.5",
+        "h226.5",
+        "v-96.42",
+        "h30.8"
+      ]
+    ],
+    [
+      "uno:A0",
+      "esp:TX",
+      "cyan",
+      [
+        "v63.5",
+        "h242",
+        "v-96.82",
+        "h24.8"
+      ]
+    ],
+    [
+      "uno:GND.3",
+      "esp:GND",
+      "black",
+      [
+        "v73.5",
+        "h277",
+        "v-97.22",
+        "h18.8"
+      ]
+    ],
+    [
+      "uno:5V",
+      "esp:VCC",
+      "red",
+      [
+        "v83.5",
+        "h302",
+        "v-97.62",
+        "h12.8"
+      ]
+    ]
+  ],
+  "dependencies": {}
+}

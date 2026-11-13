@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BIMA Smart Home</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: "Segoe UI", system-ui, sans-serif;
+    background: #f1f5f9; color: #0f172a;
+  }
+  header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 16px 24px; background: #0f172a; color: #fff;
+  }
+  h1 { margin: 0; font-size: 22px; letter-spacing: 1px; }
+  h1 span { font-weight: 400; color: #7dd3fc; }
+  main { max-width: 900px; margin: 0 auto; padding: 20px 16px; }
+  .pil {
+    padding: 4px 12px; border-radius: 99px; font-size: 13px;
+    background: #64748b; color: #fff;
+  }
+  .pil.hidup { background: #16a34a; }
+  .pil.mati { background: #dc2626; }
+  .kisi {
+    display: grid; gap: 12px;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  }
+  .kartu {
+    text-align: left; padding: 14px 16px; border: 2px solid #cbd5e1;
+    border-radius: 12px; background: #fff; font: inherit; color: inherit;
+  }
+  button.kartu { cursor: pointer; }
+  .kartu b { display: block; font-size: 15px; }
+  .kartu i {
+    display: block; margin-top: 6px; font-style: normal;
+    font-size: 13px; color: #64748b;
+  }
+  .kartu.hidup { border-color: #f59e0b; background: #fffbeb; }
+  .kartu.hidup i { color: #b45309; font-weight: 600; }
+  .kartu.sensor i { font-size: 20px; color: #0369a1; }
+  .bicara, #masuk {
+    display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+    margin: 20px 0;
+  }
+  #mik {
+    padding: 12px 22px; border: 0; border-radius: 99px;
+    background: #0284c7; color: #fff; font-size: 16px; cursor: pointer;
+  }
+  #mik.aktif { background: #dc2626; }
+  #ketik { display: flex; flex: 1; min-width: 260px; gap: 8px; }
+  input[type=text], input[type=password] {
+    flex: 1; padding: 10px 12px; border: 1px solid #94a3b8;
+    border-radius: 8px; font: inherit;
+  }
+  #ketik button, #masuk button {
+    padding: 10px 16px; border: 0; border-radius: 8px;
+    background: #0f172a; color: #fff; cursor: pointer;
+  }
+  #obrolan p {
+    margin: 6px 0; padding: 10px 14px; border-radius: 10px; background: #fff;
+  }
+  #obrolan p.bima { background: #e0f2fe; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<header>
+  <h1>BIMA <span>Smart Home</span></h1>
+  <div id="sambungan" class="pil">memeriksa...</div>
+</header>
+<main>
+  <form id="masuk" hidden>
+    <input id="sandi" type="password" placeholder="Kata sandi halaman BIMA"
+           autocomplete="current-password">
+    <button>Masuk</button>
+  </form>
+  <div id="isi" hidden>
+    <section id="kartu" class="kisi"></section>
+    <section class="bicara">
+      <button id="mik">Tekan &amp; Bicara</button>
+      <label><input type="checkbox" id="siaga">
+        Mode siaga (panggil "Bima")</label>
+      <form id="ketik">
+        <input id="teks" type="text" autocomplete="off"
+               placeholder="atau ketik: nyalakan lampu kamar">
+        <button>Kirim</button>
+      </form>
+    </section>
+    <section id="obrolan"></section>
+  </div>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+const ALAT = [
+  { kunci: 'L1', nama: 'Lampu Ruang Tamu', alat: 'LAMPU1' },
+  { kunci: 'L2', nama: 'Lampu Kamar Tidur', alat: 'LAMPU2' },
+  { kunci: 'L3', nama: 'Lampu Teras', alat: 'LAMPU3' },
+];
+// "Telinga" BIMA: pengenalan suara bawaan peramban (Web Speech API)
+const Pengenal = window.SpeechRecognition || window.webkitSpeechRecognition;
+let keadaan = {};
+let sibuk = false;   // true selama BIMA berpikir atau berbicara
+let pengaman = 0;    // pewaktu cadangan untuk mengakhiri giliran bicara
+let sandi = '';
+try { sandi = sessionStorage.getItem('sandi-bima') || ''; } catch { }
+
+// ---------- Kata sandi ----------
+function mintaSandi() {
+  $('isi').hidden = true;
+  $('masuk').hidden = false;
+  $('sambungan').textContent = 'perlu kata sandi';
+  $('sandi').focus();
+}
+$('masuk').onsubmit = (e) => {
+  e.preventDefault();
+  sandi = $('sandi').value;
+  try { sessionStorage.setItem('sandi-bima', sandi); } catch { }
+  $('masuk').hidden = true;
+  $('isi').hidden = false;
+  segarkan();
+};
+
+// ---------- Tampilan ----------
+function tampilkan(s) {
+  keadaan = s;
+  $('sambungan').textContent = s.simulasi ? 'Mode simulasi (tanpa alat)'
+    : s.online ? 'Alat online' : 'Alat offline';
+  $('sambungan').className = 'pil ' + (s.online ? 'hidup' : 'mati');
+  const suhu = String(s.SUHU ?? '-').replace('.', ',');
+  $('kartu').innerHTML = ALAT.map((a) => {
+    const hidup = s[a.kunci] ? 1 : 0;
+    return `<button class="kartu ${hidup ? 'hidup' : ''}"
+      data-kunci="${a.kunci}"><b>${a.nama}</b>
+      <i>${hidup ? 'MENYALA' : 'MATI'}</i></button>`;
+  }).join('')
+    + `<div class="kartu sensor"><b>Suhu</b><i>${suhu} &deg;C</i></div>`
+    + `<div class="kartu sensor"><b>Kelembapan</b>
+       <i>${s.LEMBAP ?? '-'} %</i></div>`;
+}
+
+function catat(siapa, teks) {
+  const p = document.createElement('p');
+  p.className = siapa === 'BIMA' ? 'bima' : '';
+  p.textContent = siapa + ': ' + teks;
+  $('obrolan').prepend(p);
+}
+
+async function api(alamat, isi) {
+  const r = await fetch(alamat, {
+    method: isi ? 'POST' : 'GET',
+    headers: { 'Content-Type': 'application/json', 'X-Kata-Sandi': sandi },
+    body: isi ? JSON.stringify(isi) : undefined,
+  });
+  if (r.status === 401) { mintaSandi(); throw new Error('kata sandi salah'); }
+  return r.json();
+}
+
+// ---------- Mengirim kalimat ke BIMA ----------
+async function kirimUcapan(teks) {
+  sibuk = true;
+  catat('Anda', teks);
+  try {
+    const h = await api('/api/ucapan', { teks });
+    catat('BIMA', h.jawaban);
+    tampilkan(h.status);
+    ucapkan(h.jawaban, h.audio);
+  } catch {
+    catat('BIMA', 'Maaf, server BIMA tidak menjawab.');
+    selesaiBicara();
+  }
+}
+
+// ---------- "Mulut" BIMA ----------
+function ucapkan(teks, audio) {
+  pengaman = setTimeout(selesaiBicara, 15000);   // jaga-jaga bila macet
+  if (audio) {                       // suara BIMA dari Gemini TTS
+    const pemutar = new Audio('data:audio/wav;base64,' + audio);
+    pemutar.onended = pemutar.onerror = selesaiBicara;
+    pemutar.play().catch(selesaiBicara);
+  } else {                           // cadangan: suara bawaan peramban
+    const ucapan = new SpeechSynthesisUtterance(teks);
+    ucapan.lang = 'id-ID';
+    ucapan.onend = ucapan.onerror = selesaiBicara;
+    speechSynthesis.speak(ucapan);
+  }
+}
+
+function selesaiBicara() {
+  clearTimeout(pengaman);
+  if (!sibuk) return;
+  sibuk = false;
+  if ($('siaga').checked) dengarkan();   // mode siaga: dengarkan lagi
+}
+
+// ---------- "Telinga" BIMA ----------
+function dengarkan() {
+  if (!window.isSecureContext) {
+    return catat('BIMA', 'Mikrofon hanya bisa dipakai lewat alamat HTTPS. '
+      + 'Untuk sementara, ketik perintahnya.');
+  }
+  if (!Pengenal) {
+    return catat('BIMA', 'Peramban ini belum mendukung pengenalan suara. '
+      + 'Pakai Chrome atau Edge.');
+  }
+  if (sibuk) return;
+  const telinga = new Pengenal();
+  telinga.lang = 'id-ID';
+  telinga.continuous = false;
+  telinga.interimResults = false;
+  telinga.onstart = () => $('mik').classList.add('aktif');
+  telinga.onresult = (e) => {
+    const teks = e.results[0][0].transcript.trim();
+    // Mode siaga: kalimat hanya diproses bila menyebut "Bima"
+    if ($('siaga').checked && !/\bbima\b/i.test(teks)) return;
+    kirimUcapan(teks);
+  };
+  telinga.onend = () => {
+    $('mik').classList.remove('aktif');
+    if ($('siaga').checked && !sibuk) dengarkan();
+  };
+  try { telinga.start(); } catch { /* sedang mendengarkan */ }
+}
+
+// ---------- Tombol ----------
+$('mik').onclick = dengarkan;
+$('siaga').onchange = () => { if ($('siaga').checked) dengarkan(); };
+$('ketik').onsubmit = (e) => {
+  e.preventDefault();
+  const teks = $('teks').value.trim();
+  if (teks && !sibuk) kirimUcapan(teks);
+  $('teks').value = '';
+};
+// Kendali manual: klik kartu untuk membalik keadaan lampu
+$('kartu').onclick = async (e) => {
+  const kartu = e.target.closest('button.kartu');
+  if (!kartu) return;
+  const a = ALAT.find((x) => x.kunci === kartu.dataset.kunci);
+  const perintah = a.alat + (keadaan[a.kunci] ? ':OFF' : ':ON');
+  const h = await api('/api/tombol', { perintah }).catch(() => ({}));
+  if (h.status) tampilkan(h.status);
+  if (h.galat) catat('BIMA', 'Maaf, ' + h.galat + '.');
+};
+
+// ---------- Mulai ----------
+function segarkan() {
+  if ($('isi').hidden) return;
+  api('/api/status').then(tampilkan).catch(() => { });
+}
+if (sandi) { $('isi').hidden = false; segarkan(); } else mintaSandi();
+setInterval(segarkan, 3000);
+</script>
+</body>
+</html>

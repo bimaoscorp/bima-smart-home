@@ -1,5 +1,5 @@
 /*
-  BIMA SMART HOME (Versi 2: WiFi + hosting) - Arduino Uno + ESP-01
+  BIMA SMART HOME (WiFi + hosting) - Arduino Uno + ESP-01
   ------------------------------------------------------------
   Arduino tersambung ke WiFi lewat modul ESP-01 (ESP8266). Tiap 2 detik
   Arduino menghubungi server BIMA di hosting sambil melaporkan keadaan:

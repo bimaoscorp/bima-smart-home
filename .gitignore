@@ -1,0 +1,4 @@
+# Berisi token AI dan kata sandi - jangan diunggah
+pengaturan.json
+.env
+node_modules/
